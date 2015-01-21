@@ -83,11 +83,12 @@ module Mixpanel
 
       decoded_message = JSON.load(message)
       api_key = decoded_message["api_key"]
+      uri_params = decoded_message.delete('uri_params')
       data = Base64.encode64(decoded_message["data"].to_json).gsub("\n", '')
 
       form_data = {"data" => data, "verbose" => 1}
       form_data.merge!("api_key" => api_key) if api_key
-
+      form_data.merge!(uri_params) if uri_params
       response_code, response_body = request(endpoint, form_data)
 
       succeeded = nil
@@ -99,6 +100,7 @@ module Mixpanel
       if ! succeeded
         raise ConnectionError.new("Could not write to Mixpanel, server responded with #{response_code} returning: '#{response_body}'")
       end
+      response_body
     end
 
     # Request takes an endpoint HTTP or HTTPS url, and a Hash of data

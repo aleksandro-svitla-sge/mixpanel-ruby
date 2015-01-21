@@ -48,6 +48,7 @@ module Mixpanel
     #         'User Sign-up Cohort' => 'July 2013'
     #     })
     def track(distinct_id, event, properties={}, ip=nil)
+      uri_params = properties.delete('uri_params')
       properties = {
           'distinct_id' => distinct_id,
           'token' => @token,
@@ -67,6 +68,7 @@ module Mixpanel
       message = {
         'data' => data
       }
+      message['uri_params'] = uri_params if uri_params
 
       @sink.call(:event, message.to_json)
     end
